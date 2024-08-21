@@ -8,7 +8,6 @@ import ru.nuthatch.filteringutility.common.SetupParameters;
 import ru.nuthatch.filteringutility.exceptions.NoInputFilePresentException;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,15 +44,16 @@ public class SetupParametersTests {
     void setupWithWrongFilePrefixTest() {
 
         String[] testArgs = {"-p", "wrong*prefix?", "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
-        Path path = Paths.get("./");
+        String path = Paths.get("./").toString();
+
 
         setupParameters.setup(testArgs);
 
         assertEquals(path, parameters.getResultPath());
-        assertEquals("integers.txt", parameters.getIntegersFileName());
-        assertEquals("floats.txt", parameters.getFloatsFileName());
-        assertEquals("strings.txt", parameters.getStringsFileName());
-        assertFalse(parameters.isAddIfFileExists());
+        assertEquals(new File(path, "integers.txt"), parameters.getIntegersFile());
+        assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
+        assertEquals(new File(path,"strings.txt"), parameters.getStringsFile());
+        assertFalse(parameters.isAppendIfFileExists());
         assertFalse(parameters.isFullStatistic());
         assertFalse(parameters.isShortStatistic());
 
@@ -66,15 +66,15 @@ public class SetupParametersTests {
     void setupWithWrongResultPathTest() {
 
         String[] testArgs = {"-o", "wrong*path?", "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
-        Path path = Paths.get("./");
+        String path = Paths.get("./").toString();
 
         setupParameters.setup(testArgs);
 
         assertEquals(path, parameters.getResultPath());
-        assertEquals("integers.txt", parameters.getIntegersFileName());
-        assertEquals("floats.txt", parameters.getFloatsFileName());
-        assertEquals("strings.txt", parameters.getStringsFileName());
-        assertFalse(parameters.isAddIfFileExists());
+        assertEquals(new File(path, "integers.txt"), parameters.getIntegersFile());
+        assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
+        assertEquals(new File(path, "strings.txt"), parameters.getStringsFile());
+        assertFalse(parameters.isAppendIfFileExists());
         assertFalse(parameters.isFullStatistic());
         assertFalse(parameters.isShortStatistic());
 
@@ -87,15 +87,15 @@ public class SetupParametersTests {
     void setupWithEmptyArgumentArrayTest() {
 
         String[] testArgs = {"-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
-        Path path = Paths.get("./");
+        String path = Paths.get("./").toString();
 
         setupParameters.setup(testArgs);
 
         assertEquals(path, parameters.getResultPath());
-        assertEquals("integers.txt", parameters.getIntegersFileName());
-        assertEquals("floats.txt", parameters.getFloatsFileName());
-        assertEquals("strings.txt", parameters.getStringsFileName());
-        assertFalse(parameters.isAddIfFileExists());
+        assertEquals(new File(path, "integers.txt"), parameters.getIntegersFile());
+        assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
+        assertEquals(new File(path, "strings.txt"), parameters.getStringsFile());
+        assertFalse(parameters.isAppendIfFileExists());
         assertFalse(parameters.isFullStatistic());
         assertFalse(parameters.isShortStatistic());
 
@@ -109,15 +109,15 @@ public class SetupParametersTests {
 
         String[] testArgs = {"-o", "/home/eev", "-p", "result_", "-a", "-f", "-s",
                 "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
-        Path path = Paths.get("/home/eev");
+        String path = Paths.get("/home/eev").toString();
 
         setupParameters.setup(testArgs);
 
         assertEquals(path, parameters.getResultPath());
-        assertEquals("result_integers.txt", parameters.getIntegersFileName());
-        assertEquals("result_floats.txt", parameters.getFloatsFileName());
-        assertEquals("result_strings.txt", parameters.getStringsFileName());
-        assertTrue(parameters.isAddIfFileExists());
+        assertEquals(new File(path, "result_integers.txt"), parameters.getIntegersFile());
+        assertEquals(new File(path, "result_floats.txt"), parameters.getFloatsFile());
+        assertEquals(new File(path, "result_strings.txt"), parameters.getStringsFile());
+        assertTrue(parameters.isAppendIfFileExists());
         assertTrue(parameters.isFullStatistic());
         assertTrue(parameters.isShortStatistic());
 
@@ -131,15 +131,15 @@ public class SetupParametersTests {
 
         String[] testArgs = {"-if", "./sample_files/in1.txt", "./sample_files/in2.txt",
                 "-p", "result_", "-a", "-f", "-s", "-o", "/home/eev"};
-        Path path = Paths.get("/home/eev");
+        String path = Paths.get("/home/eev").toString();
 
         setupParameters.setup(testArgs);
 
         assertEquals(path, parameters.getResultPath());
-        assertEquals("result_integers.txt", parameters.getIntegersFileName());
-        assertEquals("result_floats.txt", parameters.getFloatsFileName());
-        assertEquals("result_strings.txt", parameters.getStringsFileName());
-        assertTrue(parameters.isAddIfFileExists());
+        assertEquals(new File(path, "result_integers.txt"), parameters.getIntegersFile());
+        assertEquals(new File(path, "result_floats.txt"), parameters.getFloatsFile());
+        assertEquals(new File(path, "result_strings.txt"), parameters.getStringsFile());
+        assertTrue(parameters.isAppendIfFileExists());
         assertTrue(parameters.isFullStatistic());
         assertTrue(parameters.isShortStatistic());
 

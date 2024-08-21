@@ -64,7 +64,7 @@ public class SetupParameters {
                 }
                 parameters.setResultPath(cmd.getOptionValue("o"));
                 parameters.setFilesPrefix(cmd.getOptionValue("p"));
-                parameters.setAddIfFileExists(cmd.hasOption("a"));
+                parameters.setAppendIfFileExists(cmd.hasOption("a"));
                 parameters.setFullStatistic(cmd.hasOption("f"));
                 parameters.setShortStatistic(cmd.hasOption("s"));
 
