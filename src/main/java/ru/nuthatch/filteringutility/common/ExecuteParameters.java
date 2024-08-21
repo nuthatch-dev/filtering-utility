@@ -2,7 +2,9 @@ package ru.nuthatch.filteringutility.common;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.nuthatch.filteringutility.exceptions.NoInputFilePresentException;
 
+import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,6 +84,14 @@ public class ExecuteParameters {
     private boolean shortStatistic = false;
 
     @Getter
-    @Setter
-    private List<String> fileList = new ArrayList<>();
+    private List<File> fileList = new ArrayList<>();
+
+    public void setFileList(List<String> fileList) {
+        // Проверяем наличие переданных файлов, удаляем несуществующие
+        this.fileList = fileList.stream().map(File::new).filter(File::isFile).toList();
+        if (this.fileList.isEmpty()) {
+            throw new NoInputFilePresentException(
+                    "Указанные файлы входных данных отсутствуют. Дальнейшее выполнение невозможно");
+        }
+    }
 }

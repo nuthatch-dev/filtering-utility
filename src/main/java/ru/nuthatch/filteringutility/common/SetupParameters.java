@@ -73,7 +73,7 @@ public class SetupParameters {
             }
             catch (UnrecognizedOptionException exception) {
                 System.err.println("Игнорируем неопознанный аргумент командной строки: " + exception.getMessage());
-                // Удаляем неопознанный аргумент
+                // Удаляем неопознанный аргумент из массива, повторно устанавливаем параметры
                 String wrongOption = exception.getOption();
                 args = Arrays.stream(args).filter(a -> !a.equals(wrongOption)).toList().toArray(new String[0]);
             }
