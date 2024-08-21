@@ -64,7 +64,7 @@ public class SetupParameters {
                 }
                 parameters.setResultPath(cmd.getOptionValue("o"));
                 parameters.setFilesPrefix(cmd.getOptionValue("p"));
-                parameters.setAddIfFileExists(cmd.hasOption("a"));
+                parameters.setAppendIfFileExists(cmd.hasOption("a"));
                 parameters.setFullStatistic(cmd.hasOption("f"));
                 parameters.setShortStatistic(cmd.hasOption("s"));
 
@@ -73,7 +73,7 @@ public class SetupParameters {
             }
             catch (UnrecognizedOptionException exception) {
                 System.err.println("Игнорируем неопознанный аргумент командной строки: " + exception.getMessage());
-                // Удаляем неопознанный аргумент
+                // Удаляем неопознанный аргумент из массива, повторно устанавливаем параметры
                 String wrongOption = exception.getOption();
                 args = Arrays.stream(args).filter(a -> !a.equals(wrongOption)).toList().toArray(new String[0]);
             }
