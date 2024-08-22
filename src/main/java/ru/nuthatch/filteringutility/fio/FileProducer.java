@@ -37,13 +37,14 @@ public class FileProducer implements Runnable {
         }
     }
 
+    /**
+     * Определение очереди для разных типов поступающих значений
+     *
+     * @param value - Строка для добавления в очередь
+     */
     private void destinationQueue(String value) {
         try {
             Float f = Float.parseFloat(value);
-            /*
-            Из-за ограничений max/min значения типа Integer проверяем соответствие
-            регулярному выражению взамен Integer.parseInt()
-             */
             if (value.matches(INTEGER_REGEX)) {
                 integersQueue.offer(value);
             } else {

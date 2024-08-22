@@ -65,9 +65,19 @@ public class SetupParameters {
                 parameters.setResultPath(cmd.getOptionValue("o"));
                 parameters.setFilesPrefix(cmd.getOptionValue("p"));
                 parameters.setAppendIfFileExists(cmd.hasOption("a"));
-                parameters.setFullStatistic(cmd.hasOption("f"));
-                parameters.setShortStatistic(cmd.hasOption("s"));
-
+                if (cmd.hasOption("f") || cmd.hasOption("s")) {
+                    if (cmd.hasOption("f")) {
+                        parameters.setInfoLevel(InfoLevel.FULL);
+                    } else {
+                        parameters.setInfoLevel(InfoLevel.SHORT);
+                    }
+                } else {
+                    parameters.setInfoLevel(InfoLevel.DO_NOT_PROVIDE);
+                }
+                /*
+                Если парсинг удачный, завершаем цикл.
+                Иначе удаляем неопознанный аргумент и повторяем попытку
+                 */
                 optionsNotParsed = false;
 
             }
