@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.exceptions;
+package ru.nuthatch.filter.exceptions;
 
 public class NoInputFilePresentException extends RuntimeException {
 

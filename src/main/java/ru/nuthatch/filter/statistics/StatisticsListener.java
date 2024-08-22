@@ -1,10 +1,13 @@
-package ru.nuthatch.filteringutility.statistics;
+package ru.nuthatch.filter.statistics;
 
-import ru.nuthatch.filteringutility.common.InfoLevel;
+import ru.nuthatch.filter.common.InfoLevel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+/**
+ * Наблюдатель. Получение статистики по работе, передача для обработки и хранения
+ */
 public class StatisticsListener implements PropertyChangeListener {
 
     private final String INTEGER_REGEX = "-?[0-9]*";

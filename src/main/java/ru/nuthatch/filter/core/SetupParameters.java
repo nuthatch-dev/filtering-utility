@@ -1,18 +1,28 @@
-package ru.nuthatch.filteringutility.common;
+package ru.nuthatch.filter.core;
 
 import org.apache.commons.cli.*;
-import ru.nuthatch.filteringutility.exceptions.NoInputFilePresentException;
+import ru.nuthatch.filter.common.InfoLevel;
+import ru.nuthatch.filter.exceptions.NoInputFilePresentException;
 
 import java.util.Arrays;
 
+/**
+ * Установка параметров приложения в соответствии с переданными аргументами
+ */
 public class SetupParameters {
 
     /**
-     * Парсинг аргументов командной строки, установка параметров работы приложения
+     * Парсинг аргументов командной строки, установка параметров работы приложения.
+     * Проверка на наличие передаваемых приложению файлов входных данных. При отсутствии
+     * файлов - генерация исключения NoInputFilePresentException.
+     * При некорректно заданной опции - удаление опции из массива, продолжение выполнения.
      *
-     * @param args - аргументы, массив String
+     * @throws NoInputFilePresentException отсутствуют файлы входных данных
+     * @throws ParseException ошибка парсинга аргументов командной строки
+     *
+     * @param args аргументы, массив String
      */
-    public void setup(String[] args) {
+    public void setup(String[] args) throws ParseException {
 
         Options options = new Options();
 
@@ -51,10 +61,9 @@ public class SetupParameters {
 
         while (optionsNotParsed) {
             try {
-                CommandLine cmd = parser.parse(options, args);
-
-                // Установка параметров работы приложения
+                // Парсинг аргументов, установка параметров работы приложения
                 ExecuteParameters parameters = ExecuteParameters.getInstance();
+                CommandLine cmd = parser.parse(options, args);
 
                 if (cmd.hasOption("if")) {
                     parameters.setFileList(Arrays.stream(cmd.getOptionValues("if")).toList());
@@ -79,7 +88,6 @@ public class SetupParameters {
                 Иначе удаляем неопознанный аргумент и повторяем попытку
                  */
                 optionsNotParsed = false;
-
             }
             catch (UnrecognizedOptionException exception) {
                 System.err.println("Игнорируем неопознанный аргумент командной строки: " + exception.getMessage());
@@ -94,7 +102,7 @@ public class SetupParameters {
                         "java -jar filtering-utility-[VERSION].jar [options] -if file_01 file_02 ...",
                         options
                 );
-                throw new RuntimeException(exception);
+                throw exception;
             }
         }
     }

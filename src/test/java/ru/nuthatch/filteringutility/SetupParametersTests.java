@@ -1,11 +1,13 @@
 package ru.nuthatch.filteringutility;
 
+import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.nuthatch.filteringutility.common.ExecuteParameters;
-import ru.nuthatch.filteringutility.common.SetupParameters;
-import ru.nuthatch.filteringutility.exceptions.NoInputFilePresentException;
+import ru.nuthatch.filter.core.ExecuteParameters;
+import ru.nuthatch.filter.common.InfoLevel;
+import ru.nuthatch.filter.core.SetupParameters;
+import ru.nuthatch.filter.exceptions.NoInputFilePresentException;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -41,11 +43,10 @@ public class SetupParametersTests {
     }
 
     @Test
-    void setupWithWrongFilePrefixTest() {
+    void setupWithWrongFilePrefixTest() throws ParseException {
 
         String[] testArgs = {"-p", "wrong*prefix?", "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
         String path = Paths.get("./").toString();
-
 
         setupParameters.setup(testArgs);
 
@@ -54,8 +55,7 @@ public class SetupParametersTests {
         assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
         assertEquals(new File(path,"strings.txt"), parameters.getStringsFile());
         assertFalse(parameters.isAppendIfFileExists());
-        assertFalse(parameters.isFullStatistic());
-        assertFalse(parameters.isShortStatistic());
+        assertEquals(InfoLevel.DO_NOT_PROVIDE, parameters.getInfoLevel());
 
         assertEquals(2, parameters.getFileList().size());
         assertTrue(parameters.getFileList().contains(sampleFileIn1));
@@ -63,7 +63,7 @@ public class SetupParametersTests {
     }
 
     @Test
-    void setupWithWrongResultPathTest() {
+    void setupWithWrongResultPathTest() throws ParseException {
 
         String[] testArgs = {"-o", "wrong*path?", "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
         String path = Paths.get("./").toString();
@@ -75,8 +75,7 @@ public class SetupParametersTests {
         assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
         assertEquals(new File(path, "strings.txt"), parameters.getStringsFile());
         assertFalse(parameters.isAppendIfFileExists());
-        assertFalse(parameters.isFullStatistic());
-        assertFalse(parameters.isShortStatistic());
+        assertEquals(InfoLevel.DO_NOT_PROVIDE, parameters.getInfoLevel());
 
         assertEquals(2, parameters.getFileList().size());
         assertTrue(parameters.getFileList().contains(sampleFileIn1));
@@ -84,7 +83,7 @@ public class SetupParametersTests {
     }
 
     @Test
-    void setupWithEmptyArgumentArrayTest() {
+    void setupWithEmptyArgumentArrayTest() throws ParseException {
 
         String[] testArgs = {"-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
         String path = Paths.get("./").toString();
@@ -96,8 +95,7 @@ public class SetupParametersTests {
         assertEquals(new File(path, "floats.txt"), parameters.getFloatsFile());
         assertEquals(new File(path, "strings.txt"), parameters.getStringsFile());
         assertFalse(parameters.isAppendIfFileExists());
-        assertFalse(parameters.isFullStatistic());
-        assertFalse(parameters.isShortStatistic());
+        assertEquals(InfoLevel.DO_NOT_PROVIDE, parameters.getInfoLevel());
 
         assertEquals(2, parameters.getFileList().size());
         assertTrue(parameters.getFileList().contains(sampleFileIn1));
@@ -105,7 +103,7 @@ public class SetupParametersTests {
     }
 
     @Test
-    void setupWithAllArgumentsTest() {
+    void setupWithAllArgumentsTest() throws ParseException {
 
         String[] testArgs = {"-o", "/home/eev", "-p", "result_", "-a", "-f", "-s",
                 "-if", "./sample_files/in1.txt", "./sample_files/in2.txt"};
@@ -118,8 +116,7 @@ public class SetupParametersTests {
         assertEquals(new File(path, "result_floats.txt"), parameters.getFloatsFile());
         assertEquals(new File(path, "result_strings.txt"), parameters.getStringsFile());
         assertTrue(parameters.isAppendIfFileExists());
-        assertTrue(parameters.isFullStatistic());
-        assertTrue(parameters.isShortStatistic());
+        assertEquals(InfoLevel.FULL, parameters.getInfoLevel());
 
         assertEquals(2, parameters.getFileList().size());
         assertTrue(parameters.getFileList().contains(sampleFileIn1));
@@ -127,7 +124,7 @@ public class SetupParametersTests {
     }
 
     @Test
-    void setupWithAllMixedArgumentsTest() {
+    void setupWithAllMixedArgumentsTest() throws ParseException {
 
         String[] testArgs = {"-if", "./sample_files/in1.txt", "./sample_files/in2.txt",
                 "-p", "result_", "-a", "-f", "-s", "-o", "/home/eev"};
@@ -140,8 +137,7 @@ public class SetupParametersTests {
         assertEquals(new File(path, "result_floats.txt"), parameters.getFloatsFile());
         assertEquals(new File(path, "result_strings.txt"), parameters.getStringsFile());
         assertTrue(parameters.isAppendIfFileExists());
-        assertTrue(parameters.isFullStatistic());
-        assertTrue(parameters.isShortStatistic());
+        assertEquals(InfoLevel.FULL, parameters.getInfoLevel());
 
         assertEquals(2, parameters.getFileList().size());
         assertTrue(parameters.getFileList().contains(sampleFileIn1));

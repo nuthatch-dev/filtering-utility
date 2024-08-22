@@ -1,15 +1,18 @@
-package ru.nuthatch.filteringutility.common;
+package ru.nuthatch.filter.core;
 
-import ru.nuthatch.filteringutility.fio.FileConsumer;
-import ru.nuthatch.filteringutility.fio.FileProducer;
-import ru.nuthatch.filteringutility.statistics.FloatStatistics;
-import ru.nuthatch.filteringutility.statistics.StatisticsListener;
+import ru.nuthatch.filter.common.InfoLevel;
+import ru.nuthatch.filter.readwrite.FileConsumer;
+import ru.nuthatch.filter.readwrite.FileProducer;
+import ru.nuthatch.filter.statistics.StatisticsListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Core class. Запуск потоков для чтения/записи, сбор статистики.
+ */
 public class Filter {
 
     private final ExecuteParameters parameters = ExecuteParameters.getInstance();
@@ -22,6 +25,12 @@ public class Filter {
     StatisticsListener floatsListener = new StatisticsListener();
     StatisticsListener stringsListener = new StatisticsListener();
 
+    /**
+     * Подготовка и запуск поставщиков {@code FileProducer} для чтения исходных данных -
+     * отдельный поток для каждого переданного файла в списке.<p>
+     * Подготовка и запуск потребителей {@code FileConsumer} для каждого из сохраняемых типов.<p>
+     * Подключение наблюдателей для сбора статистики.
+     */
     public void filter() {
 
         List<Thread> producerThreads = new ArrayList<>();
@@ -55,7 +64,8 @@ public class Filter {
                 try {
                     thread.join();
                 } catch (InterruptedException exception) {
-                    System.err.println(exception.getMessage());
+                    System.err.println("Ошибка при выполнении. " + exception.getMessage() +
+                            "\nРезультаты выполнения могут быть некорректны");
                 }
             });
             integersThread.join();
@@ -63,10 +73,16 @@ public class Filter {
             stringsThread.join();
 
         } catch (InterruptedException exception) {
-            System.err.println(exception.getMessage());
+            System.err.println("Ошибка при выполнении. " + exception.getMessage() +
+                    "\nРезультаты выполнения могут быть некорректны");
         }
     }
 
+    /**
+     * Выдача статистики
+     *
+     * @return String
+     */
     public String getStatistics() {
         if (parameters.getInfoLevel() == InfoLevel.DO_NOT_PROVIDE) {
             return "";

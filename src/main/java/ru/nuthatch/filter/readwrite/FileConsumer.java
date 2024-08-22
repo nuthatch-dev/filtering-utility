@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.fio;
+package ru.nuthatch.filter.readwrite;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Запись данных в файл, передача статистики
+ */
 public class FileConsumer implements Runnable {
 
     private final BlockingQueue<String> queue;
