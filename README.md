@@ -17,7 +17,7 @@
 ### Запуск утилиты
 Запуск утилиты осуществляется:
 ```shell
-java -jar .\target\filtering-utility-[version].jar [options]
+java -jar filtering-utility-[version].jar [options]
 ```
 где:  
 [version] - версия,  
@@ -27,7 +27,7 @@ java -jar .\target\filtering-utility-[version].jar [options]
 Пример запуска с опцией `-h`: 
 
 ```shell
-java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -h
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -h
 usage: java -jar filtering-utility-[VERSION].jar [options] -if file_01 file_02 ...
  -a,--add-result             add result to exist files
  -f,--full                   full report
@@ -41,7 +41,7 @@ usage: java -jar filtering-utility-[VERSION].jar [options] -if file_01 file_02 .
 
 При запуске утилиты с непредусмотренной опцией, опция будет проигнорирована, утилита продолжит выполнение
 ```shell
-java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -wrong -o ./results -f -if ./sample_files/in1.txt 
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -wrong -o ./results -f -if ./sample_files/in1.txt 
 Игнорируем неопознанный аргумент командной строки: Unrecognized option: -wrong
 ```
 ### Результат работы. Вывод статистики
@@ -58,7 +58,7 @@ java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -wrong -o ./r
 будет отображена краткая информация:
 
 ```shell
-java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -s -if ./sample_files/in1.txt ./sample_files/in2.txt
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -s -if ./sample_files/in1.txt ./sample_files/in2.txt
   
   Статистика выполнения
 ======================================
@@ -75,7 +75,7 @@ java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -s -if ./samp
 При запуске с параметром `-f`/`--full` будет выведена подробная статистика:
 
 ```shell
-java -jar .\target\filtering-utility-1.0-jar-with-dependencies.jar -s -if ./sample_files/in1.txt ./sample_files/in2.txt
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -f -if ./sample_files/in1.txt ./sample_files/in2.txt
   
   Статистика выполнения
 ======================================
@@ -132,7 +132,7 @@ public void run() {
         }
     }
 ```
-Откуда (очереди) "потребители" получают данные для записи в файлы результатов.
+Откуда (из очереди) "потребители" получают данные для записи в файлы результатов.
 
 `FileConsumer.java`
 ```java
