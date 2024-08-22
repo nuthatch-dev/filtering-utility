@@ -29,26 +29,28 @@ public class SetupParameters {
         // Опции командной строки
         Option resultPath = Option.builder("o")
                 .longOpt("output-path")
-                .argName("resultPath")
+                .argName("PATH")
                 .hasArg(true)
                 .desc("output result path")
                 .build();
         Option filesPrefix = Option.builder("p")
                 .longOpt("prefix")
-                .argName("filesPrefix")
+                .argName("PREFIX")
                 .hasArg(true)
                 .desc("output file names prefix")
                 .build();
         Option fileList = Option.builder("if")
                 .longOpt("input-files")
+                .argName("FILES")
                 .hasArg(true)
-                .desc("input file names separated by commas")
+                .desc("input file names separated by space as 'file_01 file_02 ...'")
                 .build();
         fileList.setArgs(Option.UNLIMITED_VALUES);
 
         options.addOption(resultPath);
         options.addOption(filesPrefix);
         options.addOption(fileList);
+        options.addOption("h", "help", false, "show this help");
         options.addOption("a", "add-result", false, "add result to exist files");
         options.addOption("f", "full", false, "full report");
         options.addOption("s", "short", false, "short report");
@@ -65,6 +67,12 @@ public class SetupParameters {
                 ExecuteParameters parameters = ExecuteParameters.getInstance();
                 CommandLine cmd = parser.parse(options, args);
 
+                if (cmd.hasOption("h")) {
+                    formatter.printHelp(
+                            "java -jar filtering-utility-[VERSION].jar [options] -if file_01 file_02 ...",
+                            options
+                    );
+                }
                 if (cmd.hasOption("if")) {
                     parameters.setFileList(Arrays.stream(cmd.getOptionValues("if")).toList());
                 } else {
@@ -98,10 +106,6 @@ public class SetupParameters {
             catch (ParseException exception) {
                 System.err.println("Неверно заданные аргументы командной строки: " + exception.getMessage()
                         + "\nДальнейшее выполнение невозможно");
-                formatter.printHelp(
-                        "java -jar filtering-utility-[VERSION].jar [options] -if file_01 file_02 ...",
-                        options
-                );
                 throw exception;
             }
         }
