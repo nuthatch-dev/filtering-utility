@@ -1,8 +1,9 @@
-package ru.nuthatch.filteringutility.common;
+package ru.nuthatch.filter.core;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.nuthatch.filteringutility.exceptions.NoInputFilePresentException;
+import ru.nuthatch.filter.exceptions.NoInputFilePresentException;
+import ru.nuthatch.filter.common.InfoLevel;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -48,6 +49,14 @@ public class ExecuteParameters {
         }
     }
 
+    /**
+     * Установка имен файлов для сохранения результатов с учетом переданного префикса.
+     * Перед добавлением префикса производится проверка на наличие недопустимых символов
+     * в имени файла. При наличии подобных символов работа приложения выполняется
+     * с установленными по умолчанию именами файлов
+     *
+     * @param prefix префикс имени файлов для сохранения результатов
+     */
     public void setFilesPrefix(String prefix) {
         if (prefix != null) {
             try {
@@ -91,6 +100,12 @@ public class ExecuteParameters {
     @Getter
     private List<File> fileList = new ArrayList<>();
 
+    /**
+     * Установка списка файлов - источников данных.
+     * Производится проверка списка переданных имен файлов с фильтрацией по наличию
+     *
+     * @param fileList передаваемый список имен файлов - источников данных
+     */
     public void setFileList(List<String> fileList) {
         // Проверяем наличие переданных файлов, удаляем несуществующие
         this.fileList = fileList.stream().map(File::new).filter(File::isFile).toList();

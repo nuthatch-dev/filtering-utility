@@ -56,7 +56,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        ru.nuthatch.filteringutility.Application
+                                        ru.nuthatch.filter.Application
                                     </mainClass>
                                 </manifest>
                             </archive>

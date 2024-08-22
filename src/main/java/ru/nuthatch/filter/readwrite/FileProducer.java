@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.fio;
+package ru.nuthatch.filter.readwrite;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * Чтение данных из файла, определение типа данных, отправка в соответствующую очередь
+ */
 public class FileProducer implements Runnable {
 
     private final String INTEGER_REGEX = "-?[0-9]*";
@@ -40,7 +43,7 @@ public class FileProducer implements Runnable {
     /**
      * Определение очереди для разных типов поступающих значений
      *
-     * @param value - Строка для добавления в очередь
+     * @param value Строка для добавления в очередь
      */
     private void destinationQueue(String value) {
         try {

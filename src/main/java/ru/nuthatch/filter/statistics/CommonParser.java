@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.statistics;
+package ru.nuthatch.filter.statistics;
 
 @FunctionalInterface
 public interface CommonParser<R> {

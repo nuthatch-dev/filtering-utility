@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.statistics;
+package ru.nuthatch.filter.statistics;
 
 public class FloatParser implements CommonParser<Float> {
 

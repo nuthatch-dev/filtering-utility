@@ -1,6 +1,6 @@
-package ru.nuthatch.filteringutility.statistics;
+package ru.nuthatch.filter.statistics;
 
-import ru.nuthatch.filteringutility.common.InfoLevel;
+import ru.nuthatch.filter.common.InfoLevel;
 
 public class FloatStatistics implements CommonStatistics {
 

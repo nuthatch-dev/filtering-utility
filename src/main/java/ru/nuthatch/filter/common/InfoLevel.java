@@ -1,4 +1,4 @@
-package ru.nuthatch.filteringutility.common;
+package ru.nuthatch.filter.common;
 
 public enum InfoLevel {
     FULL,
