@@ -86,11 +86,7 @@ public class ExecuteParameters {
 
     @Getter
     @Setter
-    private boolean fullStatistic = false;
-
-    @Getter
-    @Setter
-    private boolean shortStatistic = false;
+    private InfoLevel infoLevel;
 
     @Getter
     private List<File> fileList = new ArrayList<>();

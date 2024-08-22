@@ -9,12 +9,8 @@ public class Application {
         SetupParameters setupParameters = new SetupParameters();
         setupParameters.setup(args);
 
-        try {
-            Filter filter = new Filter();
-            filter.filter();
-        } catch (Exception e) {
-            System.err.println("Усе пропало" + e.getMessage());
-        }
-
+        Filter filter = new Filter();
+        filter.filter();
+        System.out.println(filter.getStatistics());
     }
 }
