@@ -33,6 +33,9 @@ public class StatisticsListener implements PropertyChangeListener {
     }
 
     public String getStatistics(InfoLevel level) {
+        if (statistics == null) {
+            return "Отсутствуют данные указанного типа";
+        }
         return statistics.getStatistics(level);
     }
 

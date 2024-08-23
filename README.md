@@ -45,7 +45,7 @@ java -jar filtering-utility-1.0-jar-with-dependencies.jar -wrong -o ./results -f
 Игнорируем неопознанный аргумент командной строки: Unrecognized option: -wrong
 ```
 ### Результат работы. Вывод статистики
-Результатом работы - создание файлов результатов, каждый из которых содержит данные одного типа (целые, 
+Результат работы - создание файлов результатов, каждый из которых содержит данные одного типа (целые, 
 вещественные числа, строки).  
 По умолчанию имена файлов определены как `integers.txt`, `floats.txt`, `strings.txt`. Также размещение файлов 
 по умолчанию определено в текущей папке.  
@@ -122,33 +122,112 @@ List<Thread> producerThreads = new ArrayList<>();
 `FileProducer.java`
 ```java
 public void run() {
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                destinationQueue(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            destinationQueue(line);
         }
+    } catch (IOException exception) {
+        System.err.println("Ошибка при чтении файла: " + exception.getMessage() +
+                ". Данные файла не будут обработаны");
     }
+}
 ```
-Откуда (из очереди) "потребители" получают данные для записи в файлы результатов.
+Откуда (из очереди) "потребители" получают данные для записи в файлы результатов.  
+Также по условию задания, если в исходных файлах отсутствуют данные определенного типа, 
+результирующий файл не создается.
 
 `FileConsumer.java`
 ```java
 public void run() {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, appendIfFileExist))) {
+    try {
         String line;
-        while ((line = queue.poll(100, TimeUnit.MILLISECONDS)) != null) {
-            bw.write(line);
-            bw.newLine();
-            setStatistics(line);
+            /*
+             Ожидаем первый элемент в очереди.
+             Если не поступил, файл результатов для данного типа не создается
+             */
+        if ((line = queue.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS)) != null) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, appendIfFileExist))) {
+                while (line != null) {
+                    bw.write(line);
+                    bw.newLine();
+                    setStatistics(line);
+                    line = queue.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
+                }
+            } catch (IOException exception) {
+                System.err.println("Ошибка при сохранении в файл: " + exception.getMessage() +
+                        ". Данные не будут добавлены в файл результатов");
+            }
         }
-    } catch (IOException | InterruptedException e) {
+    } catch (InterruptedException e) {
         throw new RuntimeException(e);
     }
 }
 ```
+### Обработка исключений
+Утилитой предусмотрена обработка исключений. При этом возможно частичная обработка при наличии ошибок.
+#### Полный останов программы
+Полный останов программы выполняется в следующих случаях:
+* в командной строке не указаны имена файлов-источников данных:
+```shell
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -f
+
+Не заданы файлы с исходными данными. Дальнейшее выполнение невозможно
+```
+* все указанные параметрами файлы некорректны
+```shell
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -f -if wrong_file.txt
+
+Указанные файлы входных данных отсутствуют. Дальнейшее выполнение невозможно
+```
+#### Частичное выполнение программы
+Частичное выполнение возможно в следующих случаях:
+* В командной строке передан некорректный аргумент. В данном случае аргумент будет проигнорирован, 
+программа продолжит выполнение:
+```shell
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -wrong -o ./results -f -if ./sample_files/in1.txt 
+Игнорируем неопознанный аргумент командной строки: Unrecognized option: -wrong
+```
+* Имя одного/нескольких переданных файлов некорректно (при этом хотя бы один файл в списке корректен):
+```shell
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -if wrong_file.txt ./sample_files/in1.txt
+
+Ошибка при указании файла: wrong_file.txt. Файл исключен из обработки
+```
+* Ошибка ввода/вывода при сохранении в указанный файл результатов. При этом для остальных типов данные будут 
+обработаны
+```shell
+java -jar filtering-utility-1.0-jar-with-dependencies.jar -s -if ./sample_files/in1.txt
+
+Ошибка при сохранении в файл: .\results\prefix_floats.txt (Отказано в доступе). 
+Данные не будут добавлены в файл результатов
+
+  Статистика выполнения
+======================================
+* для целых чисел:
+Количество записанных элементов: 2
+--------------------------------------
+* для вещественных чисел:
+Отсутствуют данные указанного типа
+--------------------------------------
+* для строк:
+Количество записанных элементов: 4
+--------------------------------------
+```
 ### Сбор статистики
 Сбор статистики выполнен с использованием интерфейса `PropertyChangeListener` реализованного в классе 
 `StatisticsListener.java`.
+
+Уведомление об изменении параметра "наблюдателю" выполняется после удачной записи в файл результата
+`FileConsumer.java`
+```java
+try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, appendIfFileExist))) {
+    while (line != null) {
+        bw.write(line);
+        bw.newLine();
+        // Изменение параметра
+        setStatistics(line);
+        line = queue.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+```
+Далее "наблюдатель" отправляет полученные данные для расчета соответствующему экземпляру `CommonStatistics` 

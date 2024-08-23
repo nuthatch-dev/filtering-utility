@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileConsumer implements Runnable {
 
+    private final Long POLL_TIMEOUT = 100L;
+
     private final BlockingQueue<String> queue;
     private final File file;
     private final Boolean appendIfFileExist;
@@ -34,14 +36,26 @@ public class FileConsumer implements Runnable {
 
     @Override
     public void run() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, appendIfFileExist))) {
+        try {
             String line;
-            while ((line = queue.poll(100, TimeUnit.MILLISECONDS)) != null) {
-                bw.write(line);
-                bw.newLine();
-                setStatistics(line);
+            /*
+             Ожидаем первый элемент в очереди.
+             Если не поступил, файл результатов для данного типа не создается
+             */
+            if ((line = queue.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS)) != null) {
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, appendIfFileExist))) {
+                    while (line != null) {
+                        bw.write(line);
+                        bw.newLine();
+                        setStatistics(line);
+                        line = queue.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
+                    }
+                } catch (IOException exception) {
+                    System.err.println("Ошибка при сохранении в файл: " + exception.getMessage() +
+                            ". Данные не будут добавлены в файл результатов");
+                }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

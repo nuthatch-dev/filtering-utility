@@ -35,8 +35,9 @@ public class FileProducer implements Runnable {
             while ((line = br.readLine()) != null) {
                 destinationQueue(line);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException exception) {
+            System.err.println("Ошибка при чтении файла: " + exception.getMessage() +
+                    ". Данные файла не будут обработаны");
         }
     }
 
