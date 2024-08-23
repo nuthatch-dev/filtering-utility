@@ -74,7 +74,7 @@ public class ExecuteParameters {
     private String integersFile = BASE_INTEGERS_FILE_NAME;
 
     public File getIntegersFile() {
-        return new File(resultPath,integersFile);
+        return new File(resultPath, integersFile);
     }
 
     private String floatsFile = BASE_FLOATS_FILE_NAME;
@@ -108,7 +108,18 @@ public class ExecuteParameters {
      */
     public void setFileList(List<String> fileList) {
         // Проверяем наличие переданных файлов, удаляем несуществующие
-        this.fileList = fileList.stream().map(File::new).filter(File::isFile).toList();
+        this.fileList = fileList.stream()
+                .map(File::new)
+                .filter(file -> {
+                    if (file.isFile()) {
+                        return true;
+                    } else {
+                        System.out.println("Ошибка при указании файла: " + file +
+                                ". Файл исключен из обработки");
+                        return false;
+                    }
+                })
+                .toList();
         if (this.fileList.isEmpty()) {
             throw new NoInputFilePresentException(
                     "Указанные файлы входных данных отсутствуют. Дальнейшее выполнение невозможно");
