@@ -1,14 +1,12 @@
 package ru.nuthatch.filter.core;
 
+import ru.nuthatch.filter.common.ExtendedThreadPoolExecutor;
 import ru.nuthatch.filter.common.InfoLevel;
 import ru.nuthatch.filter.readwrite.FileConsumer;
 import ru.nuthatch.filter.readwrite.FileProducer;
 import ru.nuthatch.filter.statistics.StatisticsListener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * Core class. Запуск потоков для чтения/записи, сбор статистики.
@@ -27,54 +25,39 @@ public class Filter {
 
     /**
      * Подготовка и запуск поставщиков {@code FileProducer} для чтения исходных данных -
-     * отдельный поток для каждого переданного файла в списке.<p>
+     * отдельная задача для каждого переданного файла в списке.<p>
      * Подготовка и запуск потребителей {@code FileConsumer} для каждого из сохраняемых типов.<p>
      * Подключение наблюдателей для сбора статистики.
      */
     public void filter() {
 
-        List<Thread> producerThreads = new ArrayList<>();
-        parameters.getFileList()
-                .forEach(file -> {
-                    producerThreads.add(new Thread(new FileProducer(integersQueue, floatsQueue, stringsQueue, file)));
-                });
+        try (ExecutorService executorService = new ExtendedThreadPoolExecutor(0,
+                Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>())) {
 
-        FileConsumer integersConsumer = new FileConsumer(integersQueue, parameters.getIntegersFile(),
-                parameters.isAppendIfFileExists());
-        integersConsumer.addListener(integersListener);
-        Thread integersThread = new Thread(integersConsumer);
-
-        FileConsumer floatsConsumer = new FileConsumer(floatsQueue, parameters.getFloatsFile(),
-                parameters.isAppendIfFileExists());
-        floatsConsumer.addListener(floatsListener);
-        Thread floatsThread = new Thread(floatsConsumer);
-
-        FileConsumer stringsConsumer = new FileConsumer(stringsQueue, parameters.getStringsFile(),
-                parameters.isAppendIfFileExists());
-        stringsConsumer.addListener(stringsListener);
-        Thread stringsThread = new Thread(stringsConsumer);
-
-        producerThreads.forEach(Thread::start);
-        integersThread.start();
-        floatsThread.start();
-        stringsThread.start();
-
-        try {
-            producerThreads.forEach(thread -> {
-                try {
-                    thread.join();
-                } catch (InterruptedException exception) {
-                    System.err.println("Ошибка при выполнении. " + exception.getMessage() +
-                            "\nРезультаты выполнения могут быть некорректны");
-                }
+            // Запуск задач для поставщиков
+            parameters.getFileList().forEach(file -> {
+                executorService.submit(new FileProducer(integersQueue, floatsQueue, stringsQueue, file));
             });
-            integersThread.join();
-            floatsThread.join();
-            stringsThread.join();
 
-        } catch (InterruptedException exception) {
-            System.err.println("Ошибка при выполнении. " + exception.getMessage() +
-                    "\nРезультаты выполнения могут быть некорректны");
+            // Запуск задач для потребителей, подключение наблюдателей
+            FileConsumer integersConsumer = new FileConsumer(integersQueue, parameters.getIntegersFile(),
+                    parameters.isAppendIfFileExists());
+            integersConsumer.addListener(integersListener);
+            executorService.submit(integersConsumer);
+
+            FileConsumer floatsConsumer = new FileConsumer(floatsQueue, parameters.getFloatsFile(),
+                    parameters.isAppendIfFileExists());
+            floatsConsumer.addListener(floatsListener);
+            executorService.submit(floatsConsumer);
+
+            FileConsumer stringsConsumer = new FileConsumer(stringsQueue, parameters.getStringsFile(),
+                    parameters.isAppendIfFileExists());
+            stringsConsumer.addListener(stringsListener);
+            executorService.submit(stringsConsumer);
+
+            executorService.shutdown();
         }
     }
 

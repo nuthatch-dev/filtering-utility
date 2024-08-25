@@ -105,16 +105,20 @@ java -jar filtering-utility-1.0-jar-with-dependencies.jar -f -if ./sample_files/
 ### Чтение/запись
 Заданием предусмотрена поочередное чтение исходных файлов, при этом заранее их количество не определено. 
 В данной реализации утилиты предусмотрено создание отдельных "производителей" `FileProducer` для чтения каждого из 
-переданных утилите файлов запускаемых в отдельных потоках (Thread).
+переданных утилите файлов запускаемых в пуле.
 
 `Filter.java`:
 ```java
+try (ExecutorService executorService = new ExtendedThreadPoolExecutor(0,
+        Integer.MAX_VALUE,
+        60L, TimeUnit.SECONDS,
+        new SynchronousQueue<Runnable>())) {
 
-List<Thread> producerThreads = new ArrayList<>();
-        parameters.getFileList()
-                .forEach(file -> {
-                    producerThreads.add(new Thread(new FileProducer(integersQueue, floatsQueue, stringsQueue, file)));
-                });
+        // Запуск задач для поставщиков
+        parameters.getFileList().forEach(file -> {
+        executorService.submit(new FileProducer(integersQueue, floatsQueue, stringsQueue, file));
+        });
+        ...
 ```
 Данные, прочитанные производителем передаются в соответствующую типу данных очередь реализованную при помощи 
 `LinkedBlockingQueue`:
